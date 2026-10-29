@@ -52,6 +52,7 @@ namespace Cthangover.Mods.Audio
         /// <summary>Creates the three audio buses (Music/SFX/Ambient) if missing, the music and ambient players, and applies saved settings.</summary>
         protected override void OnReady()
         {
+            ApplicationExit.Preparing += PrepareExit;
             AddToGroup("AudioService");
             SetupBuses();
             SetupMusicPlayer();
@@ -75,6 +76,39 @@ namespace Cthangover.Mods.Audio
             {
                 ApplySettings();
             }
+        }
+
+        /// <summary>Stops and detaches streams while the audio server still exists, including pooled sound players.</summary>
+        protected override void OnExitTree()
+        {
+            ApplicationExit.Preparing -= PrepareExit;
+            ReleasePlayer(musicPlayer);
+            ReleasePlayer(ambientPlayer);
+            foreach (var player in soundPlayers.Values) ReleasePlayer(player);
+            soundPlayers.Clear();
+            musicPlayer = null;
+            ambientPlayer = null;
+        }
+
+        private async System.Threading.Tasks.Task PrepareExit(SceneTree tree)
+        {
+            SetProcess(false);
+            ambientPlayer.Finished -= OnAmbientFinished;
+            ReleasePlayer(musicPlayer);
+            ReleasePlayer(ambientPlayer);
+            foreach (var player in soundPlayers.Values) ReleasePlayer(player);
+            // Stop is queued to the mixer. Keep the main loop alive for its fade
+            // and deferred playback destruction before SceneTree.Quit shuts the server down.
+            var deadline = Godot.Time.GetTicksMsec() + 150;
+            while (Godot.Time.GetTicksMsec() < deadline)
+                await ToSignal(tree, SceneTree.SignalName.ProcessFrame);
+        }
+
+        private static void ReleasePlayer(AudioStreamPlayer player)
+        {
+            if (!IsInstanceValid(player)) return;
+            player.Stop();
+            player.Stream = null;
         }
 
         private int lastSoundsVolume = -1;

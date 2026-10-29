@@ -46,6 +46,33 @@ namespace Cthangover.Mods.Audio
         /// </summary>
         public bool IsCanAutoPlay { get; set; } = true;
 
+        /// <summary>Releases the pending fade and player reference when the audio mod leaves the tree.</summary>
+        protected override void OnExitTree()
+        {
+            ApplicationExit.Preparing -= PrepareExit;
+            StopForExit();
+        }
+
+        private System.Threading.Tasks.Task PrepareExit(SceneTree tree)
+        {
+            StopForExit();
+            return System.Threading.Tasks.Task.CompletedTask;
+        }
+
+        private void StopForExit()
+        {
+            IsCanAutoPlay = false;
+            SetProcess(false);
+            if (IsInstanceValid(fadeTween)) fadeTween.Kill();
+            fadeTween = null;
+            if (IsInstanceValid(audioPlayer))
+            {
+                audioPlayer.Stop();
+                audioPlayer.Stream = null;
+            }
+            audioPlayer = null;
+        }
+
         private Tween fadeTween;
         private bool playlistsInited;
         private double autoAdvanceCooldown;
@@ -53,6 +80,7 @@ namespace Cthangover.Mods.Audio
         /// <summary>Registers in the <c>music_player</c> group and locates the AudioService music player.</summary>
         protected override void OnReady()
         {
+            ApplicationExit.Preparing += PrepareExit;
             AddToGroup("music_player");
             TryFindAudioPlayer();
         }
