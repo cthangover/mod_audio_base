@@ -16,7 +16,8 @@ namespace Cthangover.Mods.Audio
     /// AudioStreamPlayer nodes are pooled by SoundType so overlapping sounds
     /// within the same category are cut off, while different categories stack.
     /// Settings are polled each frame rather than event-driven, detecting
-    /// volume/enabled changes cheaply.
+    /// volume/enabled changes cheaply. Playback requests are ignored once application shutdown begins,
+    /// including requests from scene changes finishing in the same frame.
     /// Exposes LinearToDb as a public static helper used elsewhere (e.g. UI sliders).
     /// GetExpLevel / GetLowLevel provide logarithmic vs linear volume scaling
     /// for contexts that need one or the other.
@@ -48,6 +49,8 @@ namespace Cthangover.Mods.Audio
         private bool? lastAmbientEnabled;
 
         private Random rnd = new Random();
+        // Scene events can still arrive while the coordinator drains the mixer.
+        private bool exiting;
 
         /// <summary>Creates the three audio buses (Music/SFX/Ambient) if missing, the music and ambient players, and applies saved settings.</summary>
         protected override void OnReady()
@@ -81,6 +84,7 @@ namespace Cthangover.Mods.Audio
         /// <summary>Stops and detaches streams while the audio server still exists, including pooled sound players.</summary>
         protected override void OnExitTree()
         {
+            exiting = true;
             ApplicationExit.Preparing -= PrepareExit;
             ReleasePlayer(musicPlayer);
             ReleasePlayer(ambientPlayer);
@@ -92,6 +96,7 @@ namespace Cthangover.Mods.Audio
 
         private async System.Threading.Tasks.Task PrepareExit(SceneTree tree)
         {
+            exiting = true;
             SetProcess(false);
             ambientPlayer.Finished -= OnAmbientFinished;
             ReleasePlayer(musicPlayer);
@@ -184,7 +189,7 @@ namespace Cthangover.Mods.Audio
 
         private void OnAmbientFinished()
         {
-            if (ambientPlayer?.Stream != null)
+            if (!exiting && ambientPlayer?.Stream != null)
                 ambientPlayer.Play();
         }
 
@@ -210,6 +215,7 @@ namespace Cthangover.Mods.Audio
         /// </summary>
         public void PlayMusic(string id, MusicType musicType)
         {
+            if (exiting) return;
             if (musicPlayer == null)
                 return;
 
@@ -267,6 +273,7 @@ namespace Cthangover.Mods.Audio
         /// </summary>
         public void PlayAmbient(string id)
         {
+            if (exiting) return;
             if (ambientPlayer == null)
                 return;
 
@@ -312,6 +319,7 @@ namespace Cthangover.Mods.Audio
         /// </summary>
         public void PlaySound(string id, int variations, SoundType soundType)
         {
+            if (exiting) return;
             if (variations < 1)
             {
                 GameLogger.Log("AUDIO", $"PlaySound '{id}' type={soundType} with invalid variations={variations}");

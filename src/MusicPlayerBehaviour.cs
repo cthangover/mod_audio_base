@@ -59,8 +59,11 @@ namespace Cthangover.Mods.Audio
             return System.Threading.Tasks.Task.CompletedTask;
         }
 
+        private bool exiting;
+
         private void StopForExit()
         {
+            exiting = true;
             IsCanAutoPlay = false;
             SetProcess(false);
             if (IsInstanceValid(fadeTween)) fadeTween.Kill();
@@ -136,6 +139,7 @@ namespace Cthangover.Mods.Audio
         /// </summary>
         public void EnabledAutoPlay()
         {
+            if (exiting) return;
             GameLogger.Log("AUDIO", "Autoplay enabled");
 
             IsCanAutoPlay = true;
@@ -201,6 +205,7 @@ namespace Cthangover.Mods.Audio
         /// </summary>
         public void UpdateMusicType(string sceneName)
         {
+            if (exiting) return;
             var previousType = playlistContext.LastMusicType;
             InitPlaylists(sceneName);
 
@@ -331,6 +336,7 @@ namespace Cthangover.Mods.Audio
         /// </summary>
         public void InitPlaylists(string sceneName)
         {
+            if (exiting) return;
             if (playlistContext.Playlist != null && playlistContext.Playlist.Scene == sceneName)
                 return;
 
@@ -357,6 +363,7 @@ namespace Cthangover.Mods.Audio
         /// </summary>
         public void PlayMusic(string name, AudioStream music, bool isLooped = false)
         {
+            if (exiting) return;
             if (audioPlayer == null || !IsInstanceValid(audioPlayer))
                 TryFindAudioPlayer();
             if (audioPlayer == null)
@@ -378,6 +385,7 @@ namespace Cthangover.Mods.Audio
         /// </summary>
         public void PlayMusic(string name, bool isLooped = false)
         {
+            if (exiting) return;
             PlayMusic(name, MusicFactory.Instance.Get(name), isLooped);
         }
 
@@ -432,6 +440,7 @@ namespace Cthangover.Mods.Audio
         /// </summary>
         public void FadeMusic()
         {
+            if (exiting) return;
             GameLogger.Log("AUDIO", "FadeMusic start (1s delay + 6s fade)");
 
             fadeTween?.Kill();
