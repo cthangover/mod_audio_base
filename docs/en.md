@@ -35,11 +35,11 @@ The settings panel is supplied by the Menu mod; Audio Engine applies these prefe
 
 ## For game authors: add a soundtrack
 
-Add `audio_base>=1` to your content mod's existing `depends` list. Install and include the mod in the intended game's collection as well: an installed content mod is not automatically part of every game.
+Add `audio_base>=0.1.0` to your content mod's existing `depends` list. Install and include the mod in the intended game's collection as well: an installed content mod is not automatically part of every game.
 
 ```jsonc
 // Add to the manifest's existing dependency list:
-"depends": ["audio_base>=1"]
+"depends": ["audio_base>=0.1.0"]
 ```
 
 Place music under `music/` and sound effects or ambient loops under `sounds/`. Use Ogg Vorbis (`.ogg`) for new examples; it is the format used by the supplied soundtrack and bar ambience.

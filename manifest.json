@@ -1,7 +1,7 @@
 {
   "id": "audio_base",
   "name": "Audio Engine",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "author": "ct",
   "description": "Audio engine: scene music, sound effects and ambience on separate buses with their own volume, and a music player that follows the current scene.",
   "category": "engine, library",
@@ -9,6 +9,6 @@
     "src/**/*.cs"
   ],
   "test_sources": ["tests/*.cs"],
-  "depends": ["shell2d_base>=1", "ui_base>=1"],
+  "depends": ["shell2d_base>=0.1.0", "ui_base>=0.1.0"],
   "ui": []
 }
