@@ -35,11 +35,11 @@ El panel de ajustes lo aporta el mod Menu; Audio Engine aplica esas preferencias
 
 ## Para autores de juegos: añadir una banda sonora
 
-Añade `audio_base>=1` a la lista `depends` ya existente en el manifiesto de tu mod de contenido. Instala e incluye el mod en la colección del juego correspondiente: un mod de contenido instalado no forma parte automáticamente de todos los juegos.
+Añade `audio_base>=0.1.0` a la lista `depends` ya existente en el manifiesto de tu mod de contenido. Instala e incluye el mod en la colección del juego correspondiente: un mod de contenido instalado no forma parte automáticamente de todos los juegos.
 
 ```jsonc
 // Añádelo a la lista de dependencias ya existente del manifiesto:
-"depends": ["audio_base>=1"]
+"depends": ["audio_base>=0.1.0"]
 ```
 
 Coloca la música bajo `music/` y los efectos o bucles de ambiente bajo `sounds/`. Para ejemplos nuevos usa Ogg Vorbis (`.ogg`): es el formato de la banda sonora y del ambiente del bar que vienen de serie.

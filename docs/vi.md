@@ -35,11 +35,11 @@ Bảng cài đặt do mod Menu cung cấp; Audio Engine áp các tùy chọn đ�
 
 ## Cho tác giả game: thêm soundtrack
 
-Thêm `audio_base>=1` vào danh sách `depends` sẵn có trong manifest của mod nội dung. Đồng thời cài mod và đưa nó vào bộ sưu tập của game định nhắm tới: mod nội dung đã cài không tự động thuộc về mọi game.
+Thêm `audio_base>=0.1.0` vào danh sách `depends` sẵn có trong manifest của mod nội dung. Đồng thời cài mod và đưa nó vào bộ sưu tập của game định nhắm tới: mod nội dung đã cài không tự động thuộc về mọi game.
 
 ```jsonc
 // Thêm vào danh sách phụ thuộc sẵn có của manifest:
-"depends": ["audio_base>=1"]
+"depends": ["audio_base>=0.1.0"]
 ```
 
 Đặt nhạc dưới `music/`, còn hiệu ứng hay vòng lặp âm nền dưới `sounds/`. Với ví dụ mới hãy dùng Ogg Vorbis (`.ogg`); soundtrack và âm quán rượu kèm sẵn đều ở định dạng này.
